@@ -13,14 +13,15 @@ class CommentsController extends Controller
 {
     public function create(Request $request)
     {
+        $user = Auth::user();
         $comment = new Comment;
-        $comment->user_id = Auth::user()->id;
+        $comment->user_id = $user->id;
         $comment->post_id = $request->id;
         $comment->comment = $request->comment;
         $comment->save();
         $comment->user;
 
-        $notif = $this->sendNotification($request->id);
+        $notif = $this->sendNotification($request->id, $user);
 
         return response()->json([
             'success' => true,
@@ -30,12 +31,10 @@ class CommentsController extends Controller
         ]);
     }
 
-    private function sendNotification($postId)
+    private function sendNotification($postId, $userCommented)
     {
         $userId = Post::select('user_id')->where('id', $postId)->first();
         $firebaseToken = User::whereNotNull('device_token')->where('id', $userId['user_id'])->pluck('device_token')->all();
-
-        $user = User::where('id', $userId['user_id'])->first();
 
         $SERVER_API_KEY = 'AAAAnqm9b-g:APA91bFVCjtMt9xTzCAbcuJiRaXwkhzVJPUZRx2YfWUlKjppNpSC_nmHmtvtPP50Dh0Ky-Os20HpDFKnI3HpvYUIzseMUfj4rO_Qpl-GgvYydZ7ymLjoGDpFthXzZF2JQvRjPSEK_yJU';
 
@@ -43,7 +42,7 @@ class CommentsController extends Controller
             "registration_ids" => $firebaseToken,
             "notification" => [
                 "title" => 'Blog App',
-                "body" => $user->name . ' ' . $user->lastname . ' has commented your post.',
+                "body" => $userCommented->name . ' ' . $userCommented->lastname . ' has commented your post.',
             ]
         ];
         $dataString = json_encode($data);
