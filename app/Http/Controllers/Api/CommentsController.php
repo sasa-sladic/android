@@ -18,7 +18,7 @@ class CommentsController extends Controller
         $comment->save();
         $comment->user;
 
-        $notif = $this->sendNotification($request->token);
+        $notif = $this->sendNotification($request->fbtoken);
 
         return response()->json([
             'success' => true,
