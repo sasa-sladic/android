@@ -33,9 +33,9 @@ class CommentsController extends Controller
     private function sendNotification($postId)
     {
         $userId = Post::select('user_id')->where('id', $postId)->first();
-        $firebaseToken = User::whereNotNull('device_token')->where('id', $userId)->pluck('device_token')->all();
+        $firebaseToken = User::whereNotNull('device_token')->where('id', $userId['user_id'])->pluck('device_token')->all();
 
-        $user = User::where('id', $userId)->first();
+        $user = User::where('id', $userId['user_id'])->first();
 
         $SERVER_API_KEY = 'AAAAnqm9b-g:APA91bFVCjtMt9xTzCAbcuJiRaXwkhzVJPUZRx2YfWUlKjppNpSC_nmHmtvtPP50Dh0Ky-Os20HpDFKnI3HpvYUIzseMUfj4rO_Qpl-GgvYydZ7ymLjoGDpFthXzZF2JQvRjPSEK_yJU';
 
