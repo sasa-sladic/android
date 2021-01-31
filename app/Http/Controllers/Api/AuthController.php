@@ -38,6 +38,7 @@ class AuthController extends Controller
 
         try {
             $user->email = $request->email;
+            $user->device_token = $request->device_token;
             $user->password = $password;
             $user->save();
 

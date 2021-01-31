@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Comment;
+use App\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -18,7 +19,7 @@ class CommentsController extends Controller
         $comment->save();
         $comment->user;
 
-        $notif = $this->sendNotification($request->fbtoken);
+        $notif = $this->sendNotification();
 
         return response()->json([
             'success' => true,
@@ -28,11 +29,15 @@ class CommentsController extends Controller
         ]);
     }
 
-    private function sendNotification($token) {
+    private function sendNotification() {
+
+        $firebaseToken = User::whereNotNull('device_token')->pluck('device_token')->all();
+
         $SERVER_API_KEY = 'AAAAnqm9b-g:APA91bFVCjtMt9xTzCAbcuJiRaXwkhzVJPUZRx2YfWUlKjppNpSC_nmHmtvtPP50Dh0Ky-Os20HpDFKnI3HpvYUIzseMUfj4rO_Qpl-GgvYydZ7ymLjoGDpFthXzZF2JQvRjPSEK_yJU';
 
+
         $data = [
-            "registration_ids" => $token,
+            "registration_ids" => $firebaseToken,
             "notification" => [
                 "title" => 'Test tile',
                 "body" => 'Added comment',
