@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Comment;
+use App\Post;
 use App\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -19,7 +20,7 @@ class CommentsController extends Controller
         $comment->save();
         $comment->user;
 
-        $notif = $this->sendNotification();
+        $notif = $this->sendNotification($request->id);
 
         return response()->json([
             'success' => true,
@@ -29,18 +30,20 @@ class CommentsController extends Controller
         ]);
     }
 
-    private function sendNotification() {
+    private function sendNotification($postId)
+    {
+        $userId = Post::select('user_id')->where($postId)->first();
+        $firebaseToken = User::whereNotNull('device_token')->where('id', $userId)->pluck('device_token')->all();
 
-        $firebaseToken = User::whereNotNull('device_token')->pluck('device_token')->all();
+        $user = User::where('id', $userId)->first();
 
         $SERVER_API_KEY = 'AAAAnqm9b-g:APA91bFVCjtMt9xTzCAbcuJiRaXwkhzVJPUZRx2YfWUlKjppNpSC_nmHmtvtPP50Dh0Ky-Os20HpDFKnI3HpvYUIzseMUfj4rO_Qpl-GgvYydZ7ymLjoGDpFthXzZF2JQvRjPSEK_yJU';
-
 
         $data = [
             "registration_ids" => $firebaseToken,
             "notification" => [
-                "title" => 'Test tile',
-                "body" => 'Added comment',
+                "title" => 'Blog App',
+                "body" => $user->name . ' ' . $user->lastname . ' has commented your post.',
             ]
         ];
         $dataString = json_encode($data);
