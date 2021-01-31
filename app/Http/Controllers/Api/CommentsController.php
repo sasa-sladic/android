@@ -18,11 +18,45 @@ class CommentsController extends Controller
         $comment->save();
         $comment->user;
 
+        $notif = $this->sendNotification($request->token);
+
         return response()->json([
             'success' => true,
             'comment' => $comment,
+            'notification_response', $notif,
             'message' => 'comment added'
         ]);
+    }
+
+    private function sendNotification($token) {
+        $SERVER_API_KEY = 'AAAAnqm9b-g:APA91bFVCjtMt9xTzCAbcuJiRaXwkhzVJPUZRx2YfWUlKjppNpSC_nmHmtvtPP50Dh0Ky-Os20HpDFKnI3HpvYUIzseMUfj4rO_Qpl-GgvYydZ7ymLjoGDpFthXzZF2JQvRjPSEK_yJU';
+
+        $data = [
+            "registration_ids" => $token,
+            "notification" => [
+                "title" => 'Test tile',
+                "body" => 'Added comment',
+            ]
+        ];
+        $dataString = json_encode($data);
+
+        $headers = [
+            'Authorization: key=' . $SERVER_API_KEY,
+            'Content-Type: application/json',
+        ];
+
+        $ch = curl_init();
+
+        curl_setopt($ch, CURLOPT_URL, 'https://fcm.googleapis.com/fcm/send');
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $dataString);
+
+        $response = curl_exec($ch);
+
+        return $response;
     }
 
     public function update(Request $request)

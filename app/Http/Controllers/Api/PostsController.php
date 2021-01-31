@@ -21,7 +21,8 @@ class PostsController extends Controller
         if ($request->photo != '') {
             //choose a unique name for photo
             $photo = time() . '.jpg';
-            file_put_contents('storage/posts/' . $photo, base64_decode($request->photo));
+            $path = 'posts/'.$photo;
+            Storage::disk('public')->put($path, base64_decode($request->photo));
             $post->photo = $photo;
         }
         //mistake

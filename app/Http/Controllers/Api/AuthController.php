@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
@@ -77,7 +78,9 @@ class AuthController extends Controller
             // user time for photo name to prevent name duplication
             $photo = time().'.jpg';
             // decode photo string and save to storage/profiles
-            file_put_contents('storage/profiles/'.$photo,base64_decode($request->photo));
+            $path = 'profiles/'.$photo;
+            Storage::disk('public')->put($path, base64_decode($request->photo));
+
             $user->photo = $photo;
         }
 
