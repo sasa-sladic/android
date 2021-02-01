@@ -16,6 +16,8 @@ class PostsController extends Controller
         $post = new Post;
         $post->user_id = Auth::user()->id;
         $post->desc = $request->desc;
+        $post->latitude = $request->latitude;
+        $post->longitude = $request->longitude;
 
         //check if post has photo
         if ($request->photo != '') {

@@ -18,6 +18,8 @@ class CreatePostsTable extends Migration
             $table->unsignedBigInteger('user_id');
             $table->string('desc');
             $table->string('photo')->default('');
+            $table->string('latitude')->default('');
+            $table->string('longitude')->default('');
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')
